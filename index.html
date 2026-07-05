@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESP32 Relay Control</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 30px;
+      background: #f4f4f4;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 12px 20px;
+      margin: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .row {
+      margin: 12px 0;
+    }
+    input[type="range"] {
+      width: 80%;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>ESP32 Relay Control</h2>
+
+    <div class="row">
+      <button onclick="sendCommand({relay1:'on'})">Relay 1 ON</button>
+      <button onclick="sendCommand({relay1:'off'})">Relay 1 OFF</button>
+    </div>
+
+    <div class="row">
+      <button onclick="sendCommand({relay2:'on'})">Relay 2 ON</button>
+      <button onclick="sendCommand({relay2:'off'})">Relay 2 OFF</button>
+    </div>
+
+    <div class="row">
+      <label for="timerSlider">Timer (seconds): </label>
+      <input type="range" min="1" max="60" value="5" id="timerSlider" oninput="timerValue.innerText=this.value">
+      <span id="timerValue">5</span>
+      <br><br>
+      <button onclick="sendSlider()">Start Timed Relay</button>
+    </div>
+
+    <div class="status" id="conn">Connecting...</div>
+    <div class="status" id="alarm">Alarm: --</div>
+    <div class="status" id="voltage">DC Bus Voltage: --</div>
+    <div class="status" id="r1">Relay1: --</div>
+    <div class="status" id="r2">Relay2: --</div>
+    <div class="status" id="r3">Relay3: --</div>
+  </div>
+
+  <script>
+    const wsProto = location.protocol === "https:" ? "wss" : "ws";
+    const ws = new WebSocket(`${wsProto}://${location.host}`);
+
+    ws.onopen = () => {
+      document.getElementById("conn").innerText = "WebSocket: Connected";
+    };
+
+    ws.onclose = () => {
+      document.getElementById("conn").innerText = "WebSocket: Disconnected";
+    };
+
+    ws.onerror = () => {
+      document.getElementById("conn").innerText = "WebSocket: Error";
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log("Received:", data);
+
+        if (data.alarm !== undefined) {
+          document.getElementById("alarm").innerText = "Alarm: " + data.alarm;
+        }
+        if (data.dcBusVoltage !== undefined) {
+          document.getElementById("voltage").innerText = "DC Bus Voltage: " + data.dcBusVoltage;
+        }
+        if (data.relay1 !== undefined) {
+          document.getElementById("r1").innerText = "Relay1: " + data.relay1;
+        }
+        if (data.relay2 !== undefined) {
+          document.getElementById("r2").innerText = "Relay2: " + data.relay2;
+        }
+        if (data.relay3 !== undefined) {
+          document.getElementById("r3").innerText = "Relay3: " + data.relay3;
+        }
+      } catch (e) {
+        console.log("Non-JSON message:", event.data);
+      }
+    };
+
+    function sendCommand(obj) {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(obj));
+      } else {
+        alert("WebSocket is not connected yet.");
+      }
+    }
+
+    function sendSlider() {
+      const seconds = parseInt(document.getElementById("timerSlider").value, 10);
+      sendCommand({ sliderRelaySec: seconds });
+    }
+  </script>
+</body>
+</html>
