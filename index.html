@@ -105,7 +105,7 @@
       border-radius:var(--radius);
       padding:18px;
       box-shadow:var(--shadow);
-      min-height:135px;
+      min-height:110px;
     }
 
     .card.wide{ grid-column:span 6; }
@@ -216,49 +216,13 @@
     .relay-top{
       display:flex;
       justify-content:space-between;
-      align-items:flex-start;
+      align-items:center;
       gap:10px;
-    }
-
-    .feedback-box{
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:12px;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-    }
-
-    .feedback-title{
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:6px;
-      text-transform:uppercase;
-      letter-spacing:.4px;
-    }
-
-    .feedback-text{
-      font-size:15px;
-      font-weight:700;
-    }
-
-    .mini-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-    }
-
-    .mini{
-      padding:16px;
-      border-radius:16px;
-      background:rgba(255,255,255,.04);
-      border:1px solid var(--line);
-      min-height:95px;
     }
 
     @media (max-width: 900px){
       .card,.card.wide,.card.full{grid-column:span 12}
       .hero{flex-direction:column;align-items:flex-start}
-      .mini-grid{grid-template-columns:1fr}
       .container{width:min(680px,94%)}
     }
 
@@ -269,7 +233,6 @@
       .card{padding:16px; min-height:auto}
       .value{font-size:24px}
       .value.small{font-size:20px}
-      .switch-row{align-items:center}
     }
   </style>
 </head>
@@ -305,24 +268,17 @@
       <div class="card wide">
         <div class="label">Relay GPIO2</div>
         <div class="relay-top">
-          <div>
-            <div id="relay2State" class="value small">OFF</div>
-          </div>
+          <div id="relay2State" class="value small warn">Relay is OFF</div>
           <label class="switch">
             <input type="checkbox" id="relay2Toggle">
             <span class="slider"></span>
           </label>
         </div>
-
-        <div class="feedback-box">
-          <div class="feedback-title">Feedback</div>
-          <div id="relay2Feedback" class="feedback-text warn">Relay is OFF</div>
-        </div>
       </div>
 
       <div class="card wide">
         <div class="label">Relay GPIO4 Delay</div>
-        <div id="relay4State" class="value small">OFF</div>
+        <div id="relay4State" class="value small warn">Relay is OFF</div>
 
         <div class="range-wrap">
           <input type="range" id="delaySlider" min="0" max="60" step="0.1" value="60">
@@ -332,29 +288,11 @@
           <span>Delay (seconds)</span>
           <strong id="delayValue">60.0 s</strong>
         </div>
-
-        <div class="feedback-box">
-          <div class="feedback-title">Feedback</div>
-          <div id="relay4Feedback" class="feedback-text warn">Relay is OFF</div>
-        </div>
       </div>
 
       <div class="card full">
-        <div class="label">Live Measurements</div>
-        <div class="mini-grid">
-          <div class="mini">
-            <div class="label">DC Bus Voltage</div>
-            <div id="dcbusValue" class="value small">--</div>
-          </div>
-          <div class="mini">
-            <div class="label">Relay GPIO2</div>
-            <div id="miniRelay2" class="value small">--</div>
-          </div>
-          <div class="mini">
-            <div class="label">Relay GPIO4</div>
-            <div id="miniRelay4" class="value small">--</div>
-          </div>
-        </div>
+        <div class="label">DC Bus Voltage</div>
+        <div id="dcbusValue" class="value">0.0 V</div>
       </div>
     </div>
   </div>
@@ -374,24 +312,14 @@
     const relay2State = document.getElementById("relay2State");
     const relay4State = document.getElementById("relay4State");
 
-    const relay2Feedback = document.getElementById("relay2Feedback");
-    const relay4Feedback = document.getElementById("relay4Feedback");
-
     const delaySlider = document.getElementById("delaySlider");
     const delayValue = document.getElementById("delayValue");
 
     const dcbusValue = document.getElementById("dcbusValue");
-    const miniRelay2 = document.getElementById("miniRelay2");
-    const miniRelay4 = document.getElementById("miniRelay4");
 
     function setWsConnected(ok) {
       wsStatus.textContent = ok ? "WebSocket: Connected" : "WebSocket: Disconnected";
       wsDot.classList.toggle("connected", ok);
-    }
-
-    function setRelayFeedback(el, isOn) {
-      el.textContent = isOn ? "Relay is ON" : "Relay is OFF";
-      el.className = "feedback-text " + (isOn ? "ok" : "warn");
     }
 
     ws.onopen = () => {
@@ -432,19 +360,15 @@
       else if (msg.type === "relay") {
         if (msg.name === "relay_gpio2") {
           const isOn = msg.value === "ON";
-          relay2State.textContent = msg.value;
+          relay2State.textContent = isOn ? "Relay is ON" : "Relay is OFF";
           relay2State.className = "value small " + (isOn ? "ok" : "warn");
-          miniRelay2.textContent = msg.value;
           relay2Toggle.checked = isOn;
-          setRelayFeedback(relay2Feedback, isOn);
         }
 
         if (msg.name === "relay_gpio4") {
           const isOn = msg.value === "ON";
-          relay4State.textContent = msg.value;
+          relay4State.textContent = isOn ? "Relay is ON" : "Relay is OFF";
           relay4State.className = "value small " + (isOn ? "ok" : "warn");
-          miniRelay4.textContent = msg.value;
-          setRelayFeedback(relay4Feedback, isOn);
         }
       }
 
