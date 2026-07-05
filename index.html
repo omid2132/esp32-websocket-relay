@@ -9,7 +9,6 @@
       --bg1:#0f172a;
       --bg2:#111827;
       --card:#1e293b;
-      --card2:#0b1220;
       --line:rgba(255,255,255,0.08);
       --txt:#e5e7eb;
       --muted:#94a3b8;
@@ -18,81 +17,85 @@
       --blue:#3b82f6;
       --cyan:#06b6d4;
       --yellow:#f59e0b;
-      --shadow:0 15px 40px rgba(0,0,0,.35);
-      --radius:22px;
+      --shadow:0 10px 28px rgba(0,0,0,.28);
+      --radius:18px;
     }
 
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:Inter,Segoe UI,Tahoma,sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(59,130,246,.18), transparent 28%),
-        radial-gradient(circle at top right, rgba(6,182,212,.14), transparent 25%),
+        radial-gradient(circle at top left, rgba(59,130,246,.16), transparent 28%),
+        radial-gradient(circle at top right, rgba(6,182,212,.12), transparent 25%),
         linear-gradient(135deg,var(--bg1),var(--bg2));
       color:var(--txt);
       min-height:100vh;
     }
 
     .container{
-      width:min(1200px,92%);
-      margin:30px auto;
+      width:min(900px,94%);
+      margin:18px auto;
     }
 
     .hero{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:20px;
-      margin-bottom:24px;
-      padding:26px;
+      gap:14px;
+      margin-bottom:16px;
+      padding:18px 20px;
       border:1px solid var(--line);
-      border-radius:28px;
+      border-radius:22px;
       background:rgba(255,255,255,0.04);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(10px);
       box-shadow:var(--shadow);
     }
 
     .hero h1{
-      margin:0 0 8px 0;
-      font-size:32px;
+      margin:0;
+      font-size:24px;
       font-weight:800;
-      letter-spacing:.5px;
+      letter-spacing:.3px;
     }
 
-    .subtitle{
+    .maker{
+      margin-top:6px;
       color:var(--muted);
-      font-size:14px;
+      font-size:13px;
     }
 
     .status-pill{
       display:inline-flex;
       align-items:center;
-      gap:10px;
-      padding:12px 18px;
+      gap:8px;
+      padding:10px 14px;
       border-radius:999px;
       background:rgba(255,255,255,.06);
       border:1px solid var(--line);
       font-weight:700;
+      font-size:14px;
+      white-space:nowrap;
     }
 
     .dot{
-      width:12px;
-      height:12px;
+      width:10px;
+      height:10px;
       border-radius:50%;
       background:var(--red);
-      box-shadow:0 0 12px var(--red);
+      box-shadow:0 0 10px var(--red);
     }
 
     .dot.connected{
       background:var(--green);
-      box-shadow:0 0 12px var(--green);
+      box-shadow:0 0 10px var(--green);
     }
 
     .grid{
       display:grid;
       grid-template-columns:repeat(12,1fr);
-      gap:18px;
+      gap:14px;
     }
 
     .card{
@@ -100,36 +103,30 @@
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border:1px solid var(--line);
       border-radius:var(--radius);
-      padding:22px;
+      padding:18px;
       box-shadow:var(--shadow);
-      min-height:170px;
+      min-height:135px;
     }
 
-    .card.wide{
-      grid-column:span 6;
-    }
-
-    .card.full{
-      grid-column:span 12;
-    }
+    .card.wide{ grid-column:span 6; }
+    .card.full{ grid-column:span 12; }
 
     .label{
       color:var(--muted);
-      font-size:13px;
-      margin-bottom:10px;
+      font-size:12px;
+      margin-bottom:8px;
       letter-spacing:.4px;
       text-transform:uppercase;
     }
 
     .value{
-      font-size:34px;
+      font-size:28px;
       font-weight:800;
       margin:0;
+      line-height:1.2;
     }
 
-    .value.small{
-      font-size:28px;
-    }
+    .value.small{ font-size:22px; }
 
     .ok{color:var(--green)}
     .bad{color:var(--red)}
@@ -140,15 +137,16 @@
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:16px;
-      margin-top:18px;
+      gap:12px;
+      margin-top:12px;
     }
 
     .switch {
       position: relative;
       display: inline-block;
-      width: 76px;
-      height: 40px;
+      width: 70px;
+      height: 38px;
+      flex-shrink:0;
     }
 
     .switch input { display:none; }
@@ -166,8 +164,8 @@
     .slider:before {
       position: absolute;
       content: "";
-      height: 30px;
-      width: 30px;
+      height: 28px;
+      width: 28px;
       left: 5px;
       top: 4px;
       background-color: white;
@@ -180,17 +178,17 @@
     }
 
     input:checked + .slider:before {
-      transform: translateX(35px);
+      transform: translateX(31px);
     }
 
     .range-wrap{
-      margin-top:16px;
+      margin-top:14px;
     }
 
     input[type="range"]{
       width:100%;
       appearance:none;
-      height:10px;
+      height:9px;
       border-radius:999px;
       outline:none;
       background:linear-gradient(90deg,#06b6d4,#3b82f6);
@@ -198,61 +196,80 @@
 
     input[type="range"]::-webkit-slider-thumb{
       appearance:none;
-      width:24px;
-      height:24px;
+      width:22px;
+      height:22px;
       border-radius:50%;
       background:#fff;
       cursor:pointer;
-      box-shadow:0 4px 18px rgba(0,0,0,.35);
+      box-shadow:0 4px 14px rgba(0,0,0,.35);
     }
 
     .delay-meta{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-top:14px;
+      margin-top:12px;
       color:var(--muted);
       font-size:14px;
     }
 
-    .delay-live{
-      margin-top:14px;
-      padding:12px 14px;
-      border-radius:14px;
+    .relay-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+    }
+
+    .feedback-box{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:12px;
       background:rgba(255,255,255,.04);
       border:1px solid var(--line);
-      color:#cbd5e1;
+    }
+
+    .feedback-title{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.4px;
+    }
+
+    .feedback-text{
+      font-size:15px;
+      font-weight:700;
     }
 
     .mini-grid{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:16px;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
     }
 
     .mini{
-      padding:18px;
-      border-radius:18px;
+      padding:16px;
+      border-radius:16px;
       background:rgba(255,255,255,.04);
       border:1px solid var(--line);
-    }
-
-    .footer-note{
-      margin-top:18px;
-      color:var(--muted);
-      font-size:13px;
-      text-align:center;
+      min-height:95px;
     }
 
     @media (max-width: 900px){
       .card,.card.wide,.card.full{grid-column:span 12}
       .hero{flex-direction:column;align-items:flex-start}
-      .mini-grid{grid-template-columns:repeat(2,1fr)}
+      .mini-grid{grid-template-columns:1fr}
+      .container{width:min(680px,94%)}
     }
 
     @media (max-width: 560px){
-      .mini-grid{grid-template-columns:1fr}
-      .value{font-size:28px}
+      .container{width:94%; margin:12px auto;}
+      .hero{padding:16px}
+      .hero h1{font-size:20px}
+      .card{padding:16px; min-height:auto}
+      .value{font-size:24px}
+      .value.small{font-size:20px}
+      .switch-row{align-items:center}
     }
   </style>
 </head>
@@ -261,7 +278,7 @@
     <div class="hero">
       <div>
         <h1>ESP32 Smart Relay Dashboard</h1>
-        <div class="subtitle">Real-time monitoring & secure control over Render WebSocket</div>
+        <div class="maker">Made by Omid Golchin</div>
       </div>
       <div class="status-pill">
         <span id="wsDot" class="dot"></span>
@@ -286,31 +303,39 @@
       </div>
 
       <div class="card wide">
-        <div class="label">Relay GPIO2 - Manual Switch</div>
-        <div class="switch-row">
+        <div class="label">Relay GPIO2</div>
+        <div class="relay-top">
           <div>
             <div id="relay2State" class="value small">OFF</div>
-            <div class="subtitle">Direct live control from dashboard</div>
           </div>
           <label class="switch">
             <input type="checkbox" id="relay2Toggle">
             <span class="slider"></span>
           </label>
         </div>
+
+        <div class="feedback-box">
+          <div class="feedback-title">Feedback</div>
+          <div id="relay2Feedback" class="feedback-text warn">Relay is OFF</div>
+        </div>
       </div>
 
       <div class="card wide">
-        <div class="label">Relay GPIO4 - Delay Control Only</div>
+        <div class="label">Relay GPIO4 Delay</div>
         <div id="relay4State" class="value small">OFF</div>
+
         <div class="range-wrap">
-          <input type="range" id="delaySlider" min="0" max="120" step="0.5" value="60">
+          <input type="range" id="delaySlider" min="0" max="60" step="0.1" value="60">
         </div>
+
         <div class="delay-meta">
           <span>Delay (seconds)</span>
           <strong id="delayValue">60.0 s</strong>
         </div>
-        <div class="delay-live">
-          Live online delay control enabled — no separate switch needed.
+
+        <div class="feedback-box">
+          <div class="feedback-title">Feedback</div>
+          <div id="relay4Feedback" class="feedback-text warn">Relay is OFF</div>
         </div>
       </div>
 
@@ -329,16 +354,8 @@
             <div class="label">Relay GPIO4</div>
             <div id="miniRelay4" class="value small">--</div>
           </div>
-          <div class="mini">
-            <div class="label">Delay Setpoint</div>
-            <div id="miniDelay" class="value small">--</div>
-          </div>
         </div>
       </div>
-    </div>
-
-    <div class="footer-note">
-      Secure WSS connection • ESP32 + Render • Real-time dashboard
     </div>
   </div>
 
@@ -357,22 +374,24 @@
     const relay2State = document.getElementById("relay2State");
     const relay4State = document.getElementById("relay4State");
 
+    const relay2Feedback = document.getElementById("relay2Feedback");
+    const relay4Feedback = document.getElementById("relay4Feedback");
+
     const delaySlider = document.getElementById("delaySlider");
     const delayValue = document.getElementById("delayValue");
 
     const dcbusValue = document.getElementById("dcbusValue");
     const miniRelay2 = document.getElementById("miniRelay2");
     const miniRelay4 = document.getElementById("miniRelay4");
-    const miniDelay = document.getElementById("miniDelay");
 
     function setWsConnected(ok) {
       wsStatus.textContent = ok ? "WebSocket: Connected" : "WebSocket: Disconnected";
       wsDot.classList.toggle("connected", ok);
     }
 
-    function setText(el, txt, cls="") {
-      el.textContent = txt;
-      el.className = "value small " + cls;
+    function setRelayFeedback(el, isOn) {
+      el.textContent = isOn ? "Relay is ON" : "Relay is OFF";
+      el.className = "feedback-text " + (isOn ? "ok" : "warn");
     }
 
     ws.onopen = () => {
@@ -412,23 +431,26 @@
 
       else if (msg.type === "relay") {
         if (msg.name === "relay_gpio2") {
+          const isOn = msg.value === "ON";
           relay2State.textContent = msg.value;
-          relay2State.className = "value small " + (msg.value === "ON" ? "ok" : "warn");
+          relay2State.className = "value small " + (isOn ? "ok" : "warn");
           miniRelay2.textContent = msg.value;
-          relay2Toggle.checked = msg.value === "ON";
+          relay2Toggle.checked = isOn;
+          setRelayFeedback(relay2Feedback, isOn);
         }
 
         if (msg.name === "relay_gpio4") {
+          const isOn = msg.value === "ON";
           relay4State.textContent = msg.value;
-          relay4State.className = "value small " + (msg.value === "ON" ? "ok" : "warn");
+          relay4State.className = "value small " + (isOn ? "ok" : "warn");
           miniRelay4.textContent = msg.value;
+          setRelayFeedback(relay4Feedback, isOn);
         }
       }
 
       else if (msg.type === "delay") {
         const val = Number(msg.value).toFixed(1);
         delayValue.textContent = `${val} s`;
-        miniDelay.textContent = `${val} s`;
         delaySlider.value = val;
       }
 
