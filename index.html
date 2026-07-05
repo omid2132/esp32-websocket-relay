@@ -2,124 +2,459 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ESP32 Relay Control</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ESP32 Smart Relay Dashboard</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 30px;
-      background: #f4f4f4;
+    :root{
+      --bg1:#0f172a;
+      --bg2:#111827;
+      --card:#1e293b;
+      --card2:#0b1220;
+      --line:rgba(255,255,255,0.08);
+      --txt:#e5e7eb;
+      --muted:#94a3b8;
+      --green:#22c55e;
+      --red:#ef4444;
+      --blue:#3b82f6;
+      --cyan:#06b6d4;
+      --yellow:#f59e0b;
+      --shadow:0 15px 40px rgba(0,0,0,.35);
+      --radius:22px;
     }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 500px;
-      margin: auto;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,Segoe UI,Tahoma,sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(6,182,212,.14), transparent 25%),
+        linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:var(--txt);
+      min-height:100vh;
     }
-    button {
-      padding: 12px 20px;
-      margin: 8px;
-      font-size: 16px;
+
+    .container{
+      width:min(1200px,92%);
+      margin:30px auto;
+    }
+
+    .hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      margin-bottom:24px;
+      padding:26px;
+      border:1px solid var(--line);
+      border-radius:28px;
+      background:rgba(255,255,255,0.04);
+      backdrop-filter: blur(12px);
+      box-shadow:var(--shadow);
+    }
+
+    .hero h1{
+      margin:0 0 8px 0;
+      font-size:32px;
+      font-weight:800;
+      letter-spacing:.5px;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 18px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--line);
+      font-weight:700;
+    }
+
+    .dot{
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:var(--red);
+      box-shadow:0 0 12px var(--red);
+    }
+
+    .dot.connected{
+      background:var(--green);
+      box-shadow:0 0 12px var(--green);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:18px;
+    }
+
+    .card{
+      grid-column:span 4;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:22px;
+      box-shadow:var(--shadow);
+      min-height:170px;
+    }
+
+    .card.wide{
+      grid-column:span 6;
+    }
+
+    .card.full{
+      grid-column:span 12;
+    }
+
+    .label{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:10px;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+    }
+
+    .value{
+      font-size:34px;
+      font-weight:800;
+      margin:0;
+    }
+
+    .value.small{
+      font-size:28px;
+    }
+
+    .ok{color:var(--green)}
+    .bad{color:var(--red)}
+    .warn{color:var(--yellow)}
+    .info{color:#7dd3fc}
+
+    .switch-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-top:18px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 76px;
+      height: 40px;
+    }
+
+    .switch input { display:none; }
+
+    .slider {
+      position: absolute;
       cursor: pointer;
+      inset: 0;
+      background-color: #334155;
+      transition: .3s;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.08);
     }
-    .status {
-      margin-top: 20px;
-      font-weight: bold;
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 30px;
+      width: 30px;
+      left: 5px;
+      top: 4px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
     }
-    .row {
-      margin: 12px 0;
+
+    input:checked + .slider {
+      background: linear-gradient(90deg,#16a34a,#22c55e);
     }
-    input[type="range"] {
-      width: 80%;
+
+    input:checked + .slider:before {
+      transform: translateX(35px);
+    }
+
+    .range-wrap{
+      margin-top:16px;
+    }
+
+    input[type="range"]{
+      width:100%;
+      appearance:none;
+      height:10px;
+      border-radius:999px;
+      outline:none;
+      background:linear-gradient(90deg,#06b6d4,#3b82f6);
+    }
+
+    input[type="range"]::-webkit-slider-thumb{
+      appearance:none;
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      background:#fff;
+      cursor:pointer;
+      box-shadow:0 4px 18px rgba(0,0,0,.35);
+    }
+
+    .delay-meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:14px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .delay-live{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+      color:#cbd5e1;
+    }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+    }
+
+    .mini{
+      padding:18px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+    }
+
+    .footer-note{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+    }
+
+    @media (max-width: 900px){
+      .card,.card.wide,.card.full{grid-column:span 12}
+      .hero{flex-direction:column;align-items:flex-start}
+      .mini-grid{grid-template-columns:repeat(2,1fr)}
+    }
+
+    @media (max-width: 560px){
+      .mini-grid{grid-template-columns:1fr}
+      .value{font-size:28px}
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>ESP32 Relay Control</h2>
-
-    <div class="row">
-      <button onclick="sendCommand({relay1:'on'})">Relay 1 ON</button>
-      <button onclick="sendCommand({relay1:'off'})">Relay 1 OFF</button>
+  <div class="container">
+    <div class="hero">
+      <div>
+        <h1>ESP32 Smart Relay Dashboard</h1>
+        <div class="subtitle">Real-time monitoring & secure control over Render WebSocket</div>
+      </div>
+      <div class="status-pill">
+        <span id="wsDot" class="dot"></span>
+        <span id="wsStatus">WebSocket: Connecting...</span>
+      </div>
     </div>
 
-    <div class="row">
-      <button onclick="sendCommand({relay2:'on'})">Relay 2 ON</button>
-      <button onclick="sendCommand({relay2:'off'})">Relay 2 OFF</button>
+    <div class="grid">
+      <div class="card">
+        <div class="label">Device Status</div>
+        <div id="deviceStatus" class="value small warn">WAITING</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Current Time</div>
+        <div id="timeValue" class="value info">--:--:--</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Alarm Status</div>
+        <div id="alarmValue" class="value warn">--</div>
+      </div>
+
+      <div class="card wide">
+        <div class="label">Relay GPIO2 - Manual Switch</div>
+        <div class="switch-row">
+          <div>
+            <div id="relay2State" class="value small">OFF</div>
+            <div class="subtitle">Direct live control from dashboard</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="relay2Toggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="card wide">
+        <div class="label">Relay GPIO4 - Delay Control Only</div>
+        <div id="relay4State" class="value small">OFF</div>
+        <div class="range-wrap">
+          <input type="range" id="delaySlider" min="0" max="120" step="0.5" value="60">
+        </div>
+        <div class="delay-meta">
+          <span>Delay (seconds)</span>
+          <strong id="delayValue">60.0 s</strong>
+        </div>
+        <div class="delay-live">
+          Live online delay control enabled — no separate switch needed.
+        </div>
+      </div>
+
+      <div class="card full">
+        <div class="label">Live Measurements</div>
+        <div class="mini-grid">
+          <div class="mini">
+            <div class="label">DC Bus Voltage</div>
+            <div id="dcbusValue" class="value small">--</div>
+          </div>
+          <div class="mini">
+            <div class="label">Relay GPIO2</div>
+            <div id="miniRelay2" class="value small">--</div>
+          </div>
+          <div class="mini">
+            <div class="label">Relay GPIO4</div>
+            <div id="miniRelay4" class="value small">--</div>
+          </div>
+          <div class="mini">
+            <div class="label">Delay Setpoint</div>
+            <div id="miniDelay" class="value small">--</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
-      <label for="timerSlider">Timer (seconds): </label>
-      <input type="range" min="1" max="60" value="5" id="timerSlider" oninput="timerValue.innerText=this.value">
-      <span id="timerValue">5</span>
-      <br><br>
-      <button onclick="sendSlider()">Start Timed Relay</button>
+    <div class="footer-note">
+      Secure WSS connection • ESP32 + Render • Real-time dashboard
     </div>
-
-    <div class="status" id="conn">Connecting...</div>
-    <div class="status" id="alarm">Alarm: --</div>
-    <div class="status" id="voltage">DC Bus Voltage: --</div>
-    <div class="status" id="r1">Relay1: --</div>
-    <div class="status" id="r2">Relay2: --</div>
-    <div class="status" id="r3">Relay3: --</div>
   </div>
 
   <script>
-    const wsProto = location.protocol === "https:" ? "wss" : "ws";
-    const ws = new WebSocket(`${wsProto}://${location.host}`);
+    const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
+    const ws = new WebSocket(`${wsProtocol}://${location.host}`);
+
+    const wsStatus = document.getElementById("wsStatus");
+    const wsDot = document.getElementById("wsDot");
+
+    const deviceStatus = document.getElementById("deviceStatus");
+    const timeValue = document.getElementById("timeValue");
+    const alarmValue = document.getElementById("alarmValue");
+
+    const relay2Toggle = document.getElementById("relay2Toggle");
+    const relay2State = document.getElementById("relay2State");
+    const relay4State = document.getElementById("relay4State");
+
+    const delaySlider = document.getElementById("delaySlider");
+    const delayValue = document.getElementById("delayValue");
+
+    const dcbusValue = document.getElementById("dcbusValue");
+    const miniRelay2 = document.getElementById("miniRelay2");
+    const miniRelay4 = document.getElementById("miniRelay4");
+    const miniDelay = document.getElementById("miniDelay");
+
+    function setWsConnected(ok) {
+      wsStatus.textContent = ok ? "WebSocket: Connected" : "WebSocket: Disconnected";
+      wsDot.classList.toggle("connected", ok);
+    }
+
+    function setText(el, txt, cls="") {
+      el.textContent = txt;
+      el.className = "value small " + cls;
+    }
 
     ws.onopen = () => {
-      document.getElementById("conn").innerText = "WebSocket: Connected";
+      setWsConnected(true);
+      ws.send(JSON.stringify({ cmd: "snapshot" }));
     };
 
     ws.onclose = () => {
-      document.getElementById("conn").innerText = "WebSocket: Disconnected";
+      setWsConnected(false);
     };
 
     ws.onerror = () => {
-      document.getElementById("conn").innerText = "WebSocket: Error";
+      setWsConnected(false);
     };
 
     ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log("Received:", data);
+      const msg = JSON.parse(event.data);
 
-        if (data.alarm !== undefined) {
-          document.getElementById("alarm").innerText = "Alarm: " + data.alarm;
+      if (msg.type === "device") {
+        deviceStatus.textContent = msg.value || "--";
+        deviceStatus.className = "value small ok";
+      }
+
+      else if (msg.type === "time") {
+        timeValue.textContent = msg.value || "--:--:--";
+      }
+
+      else if (msg.type === "alarm") {
+        if (msg.value === "INTRUDER") {
+          alarmValue.textContent = "INTRUDER";
+          alarmValue.className = "value bad";
+        } else {
+          alarmValue.textContent = "CLEAR";
+          alarmValue.className = "value ok";
         }
-        if (data.dcBusVoltage !== undefined) {
-          document.getElementById("voltage").innerText = "DC Bus Voltage: " + data.dcBusVoltage;
+      }
+
+      else if (msg.type === "relay") {
+        if (msg.name === "relay_gpio2") {
+          relay2State.textContent = msg.value;
+          relay2State.className = "value small " + (msg.value === "ON" ? "ok" : "warn");
+          miniRelay2.textContent = msg.value;
+          relay2Toggle.checked = msg.value === "ON";
         }
-        if (data.relay1 !== undefined) {
-          document.getElementById("r1").innerText = "Relay1: " + data.relay1;
+
+        if (msg.name === "relay_gpio4") {
+          relay4State.textContent = msg.value;
+          relay4State.className = "value small " + (msg.value === "ON" ? "ok" : "warn");
+          miniRelay4.textContent = msg.value;
         }
-        if (data.relay2 !== undefined) {
-          document.getElementById("r2").innerText = "Relay2: " + data.relay2;
-        }
-        if (data.relay3 !== undefined) {
-          document.getElementById("r3").innerText = "Relay3: " + data.relay3;
-        }
-      } catch (e) {
-        console.log("Non-JSON message:", event.data);
+      }
+
+      else if (msg.type === "delay") {
+        const val = Number(msg.value).toFixed(1);
+        delayValue.textContent = `${val} s`;
+        miniDelay.textContent = `${val} s`;
+        delaySlider.value = val;
+      }
+
+      else if (msg.type === "dcbus") {
+        dcbusValue.textContent = `${Number(msg.value).toFixed(1)} V`;
       }
     };
 
-    function sendCommand(obj) {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(obj));
-      } else {
-        alert("WebSocket is not connected yet.");
-      }
-    }
+    relay2Toggle.addEventListener("change", () => {
+      const value = relay2Toggle.checked ? "ON" : "OFF";
+      ws.send(JSON.stringify({
+        cmd: "relay_gpio2",
+        value
+      }));
+    });
 
-    function sendSlider() {
-      const seconds = parseInt(document.getElementById("timerSlider").value, 10);
-      sendCommand({ sliderRelaySec: seconds });
-    }
+    delaySlider.addEventListener("input", () => {
+      delayValue.textContent = `${Number(delaySlider.value).toFixed(1)} s`;
+    });
+
+    delaySlider.addEventListener("change", () => {
+      ws.send(JSON.stringify({
+        cmd: "delay_gpio4",
+        value: Number(delaySlider.value)
+      }));
+    });
   </script>
 </body>
 </html>
